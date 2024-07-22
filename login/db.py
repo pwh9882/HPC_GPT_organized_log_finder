@@ -64,6 +64,19 @@ def authenticate_user(username, password):
     
     return user is not None
 
+def user_exists(email):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM users WHERE email = ?
+    ''', (email,))
+    
+    user = cursor.fetchone()
+    conn.close()
+    
+    return user is not None
+
 def delete_user(username):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
