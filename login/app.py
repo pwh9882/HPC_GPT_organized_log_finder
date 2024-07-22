@@ -1,5 +1,5 @@
 import streamlit as st
-from db import create_database, register_user, authenticate_user, user_exists, create_conversation, find_conversation
+from db import create_database, register_user, authenticate_user, user_exists
 from email_utils import send_reset_email
 
 def main():
@@ -23,13 +23,8 @@ def login_page():
     if st.button("로그인"):
         username = st.session_state.login_username
         password = st.session_state.login_password
-        user = authenticate_user(username, password)
-        if user:
+        if authenticate_user(username, password):
             st.success(f"Welcome {username}")
-            session_id = f"session_{username}_{user[0]}"
-            create_conversation(session_id, user[0])
-            st.session_state.page = 'conversation'
-            st.experimental_rerun()
         else:
             st.warning("Incorrect Username/Password")
 
