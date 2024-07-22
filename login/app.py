@@ -1,13 +1,12 @@
 import streamlit as st
-from db import create_database, register_user, authenticate_user
+from db import create_database, register_user, authenticate_user, delete_user, update_user, find_user
 
 def main():
-    # 애플리케이션 시작 시 데이터베이스 생성
     create_database()
     
     st.title("User Authentication System")
 
-    menu = ["Home", "Login", "SignUp"]
+    menu = ["Home", "Login", "SignUp", "Delete", "Update", "Find"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
@@ -36,6 +35,40 @@ def main():
                 st.success("You have successfully created an account")
             else:
                 st.warning("Username or Email already exists")
+                
+    elif choice == "Delete":
+        st.subheader("Delete Account")
+
+        username = st.text_input("Username to delete")
+        if st.button("Delete"):
+            if delete_user(username):
+                st.success(f"User {username} deleted successfully")
+            else:
+                st.warning("User not found")
+
+    elif choice == "Update":
+        st.subheader("Update Account Information")
+
+        username = st.text_input("Username to update")
+        new_email = st.text_input("New Email")
+        new_password = st.text_input("New Password", type='password')
+
+        if st.button("Update"):
+            if update_user(username, new_email, new_password):
+                st.success(f"User {username} updated successfully")
+            else:
+                st.warning("User not found or no changes made")
+    
+    elif choice == "Find":
+        st.subheader("Find User")
+
+        username = st.text_input("Username to find")
+        if st.button("Find"):
+            user = find_user(username)
+            if user:
+                st.success(f"User found: {user}")
+            else:
+                st.warning("User not found")
 
 if __name__ == '__main__':
     main()
