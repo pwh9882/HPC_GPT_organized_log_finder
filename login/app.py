@@ -1,51 +1,10 @@
-import sqlite3
-import hashlib
 import streamlit as st
-
-def hash_password(password):
-    # 비밀번호를 해시화합니다.
-    return hashlib.sha256(password.encode()).hexdigest()
-
-def register_user(username, email, password):
-    # 데이터베이스에 새로운 사용자 정보를 추가합니다.
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    hashed_password = hash_password(password)
-    
-    try:
-        cursor.execute('''
-            INSERT INTO users (username, email, password)
-            VALUES (?, ?, ?)
-        ''', (username, email, hashed_password))
-        conn.commit()
-    except sqlite3.IntegrityError:
-        return False
-    finally:
-        conn.close()
-    return True
-
-def authenticate_user(username, password):
-    # 사용자 인증을 처리합니다.
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    hashed_password = hash_password(password)
-    
-    cursor.execute('''
-        SELECT * FROM users WHERE username = ? AND password = ?
-    ''', (username, hashed_password))
-    
-    user = cursor.fetchone()
-    conn.close()
-    
-    if user:
-        return True
-    else:
-        return False
+from db import create_database, register_user, authenticate_user
 
 def main():
-    # Streamlit 애플리케이션 UI 설정
+    # 애플리케이션 시작 시 데이터베이스 생성
+    create_database()
+    
     st.title("User Authentication System")
 
     menu = ["Home", "Login", "SignUp"]
