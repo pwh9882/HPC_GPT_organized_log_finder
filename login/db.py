@@ -101,3 +101,16 @@ def find_user(username):
     conn.close()
     
     return user
+
+def user_exists(email):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM users WHERE email = ?
+    ''', (email,))
+    
+    user = cursor.fetchone()
+    conn.close()
+    
+    return user is not None
