@@ -1,103 +1,54 @@
-import sqlite3
-import hashlib
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password, check_password
+from django.db import IntegrityError
+
+User = get_user_model()
 
 def create_database():
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            email TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+    # 데이터베이스는 Django가 관리하므로 특별한 작업이 필요 없습니다.
+    pass
 
 def register_user(username, email, password):
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    hashed_password = hash_password(password)
-    
     try:
-        cursor.execute('''
-            INSERT INTO users (username, email, password)
-            VALUES (?, ?, ?)
-        ''', (username, email, hashed_password))
-        conn.commit()
-    except sqlite3.IntegrityError:
+        user = User.objects.create(username=username, email=email, password=make_password(password))
+        user.save()
+        return True
+    except IntegrityError:
         return False
-    finally:
-        conn.close()
-    return True
 
 def authenticate_user(username, password):
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    hashed_password = hash_password(password)
-    
-    cursor.execute('''
-        SELECT * FROM users WHERE username = ? AND password = ?
-    ''', (username, hashed_password))
-    
-    user = cursor.fetchone()
-    conn.close()
-    
-    if user:
-        return True
-    else:
+    try:
+        user = User.objects.get(username=username)
+        if check_password(password, user.password):
+            return True
+        else:
+            return False
+    except User.DoesNotExist:
         return False
 
 def delete_user(username):
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        DELETE FROM users WHERE username = ?
-    ''', (username,))
-    
-    conn.commit()
-    conn.close()
-    
-    return cursor.rowcount > 0
+    try:
+        user = User.objects.get(username=username)
+        user.delete()
+        return True
+    except User.DoesNotExist:
+        return False
 
 def update_user(username, new_email=None, new_password=None):
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    if new_email:
-        cursor.execute('''
-            UPDATE users SET email = ? WHERE username = ?
-        ''', (new_email, username))
-        
-    if new_password:
-        hashed_password = hash_password(new_password)
-        cursor.execute('''
-            UPDATE users SET password = ? WHERE username = ?
-        ''', (hashed_password, username))
-    
-    conn.commit()
-    conn.close()
-    
-    return cursor.rowcount > 0
+    try:
+        user = User.objects.get(username=username)
+        if new_email:
+            user.email = new_email
+        if new_password:
+            user.password = make_password(new_password)
+        user.save()
+        return True
+    except User.DoesNotExist:
+        return False
 
 def find_user(username):
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        SELECT * FROM users WHERE username = ?
-    ''', (username,))
-    
-    user = cursor.fetchone()
-    conn.close()
-    
-    return user
+    try:
+        user = User.objects.get(username=username)
+        return user
+    except User.DoesNotExist:
+        return None
