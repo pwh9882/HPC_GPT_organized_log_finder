@@ -73,14 +73,19 @@ for message in st.session_state.messages:
 
 # React to user input
 if prompt := st.chat_input("Message"):
-    st.chat_message("user").markdown(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    chatbot = st.session_state.main_chatbot
 
-    response = f"Echo: {prompt}"
+    user_id = st.session_state.user_id
+    conversation_id = st.session_state.conversation_id
+
+    st.chat_message("user").markdown(prompt)
+    st.session_state.messages.append({"role": "Human", "content": prompt})
+
+    response = chatbot.invoke_chain(prompt, user_id, conversation_id)
     # Display assistant response in chat message container
-    with st.chat_message("assistant"):
+    with st.chat_message("AI"):
         st.markdown(response)
     # Add assistant response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "AI", "content": response})
 
 
