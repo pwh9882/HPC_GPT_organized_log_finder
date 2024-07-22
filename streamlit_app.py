@@ -2,17 +2,45 @@ import streamlit as st
 from streamlit_extras.grid import grid
 import copy
 
+from summerizer.summerizer import SQLSummaryChatBot
+
+
+if "main_chatbot" not in st.session_state:
+    st.session_state.main_chatbot = SQLSummaryChatBot()
+
+
+def load_conversation(conversation_id):
+    chatbot = st.session_state.main_chatbot
+
+    user_id = st.session_state.user_id
+    st.session_state.conversation_id = conversation_id
+
+    history = chatbot.get_chat_history(user_id, conversation_id).messages
+    st.session_state.messages.clear()
+
+    for i, message in enumerate(history):
+        if i % 2 == 0:
+            role = "Human"
+        else:
+            role = "AI"
+
+        st.session_state.messages.append({"role": role, "content": message.content})
+
+
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-if "session_id" not in st.session_state:
-    st.session_state.session_id = 0
+if "user_id" not in st.session_state:
+    st.session_state.user_id = "user1"
+
+if "conversation_id" not in st.session_state:
+    load_conversation("conversation1")
 
 
 def draw_session_title():
     global title_placeholder
-    title_placeholder.title("Session" + str(st.session_state.session_id))
+    title_placeholder.title(st.session_state.conversation_id)
 
 
 title_placeholder = st.empty()
@@ -23,13 +51,12 @@ with st.sidebar:
 
     with st.container(height=300, border=True):
         def on_session_button_clicked(id):
-            st.session_state.session_id = id
+            load_conversation(id)
             draw_session_title()
-
 
         for i in range(1, 11):
             if st.button("session" + str(i), use_container_width=True):
-                on_session_button_clicked(i)
+                on_session_button_clicked("conversation" + str(i))
             # st.page_link(page="streamlit_app.py", label="session" + str(i))
 
     with st.container(height=300, border=True):
@@ -45,10 +72,8 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # React to user input
-if prompt := st.chat_input("What is up?"):
-    # Display user message in chat message container
+if prompt := st.chat_input("Message"):
     st.chat_message("user").markdown(prompt)
-    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     response = f"Echo: {prompt}"
@@ -57,3 +82,5 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(response)
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": response})
+
+
