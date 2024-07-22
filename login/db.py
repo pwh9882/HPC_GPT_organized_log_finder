@@ -5,6 +5,7 @@ def create_database():
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
+    # users 테이블을 생성합니다.
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,14 +15,16 @@ def create_database():
         )
     ''')
 
+    # conversation 테이블을 생성합니다.
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS conversations (
-            session_id TEXT PRIMARY KEY,
-            user_id INTEGER,
-            FOREIGN KEY (user_id) REFERENCES users (id)
+        CREATE TABLE IF NOT EXISTS conversation (
+            userid TEXT NOT NULL,
+            conversationid TEXT NOT NULL,
+            last_modified DATE NOT NULL,
+            PRIMARY KEY (userid, conversationid)
         )
     ''')
-
+    
     conn.commit()
     conn.close()
 
@@ -53,13 +56,26 @@ def authenticate_user(username, password):
     hashed_password = hash_password(password)
     
     cursor.execute('''
-        SELECT id FROM users WHERE username = ? AND password = ?
+        SELECT * FROM users WHERE username = ? AND password = ?
     ''', (username, hashed_password))
     
     user = cursor.fetchone()
     conn.close()
     
-    return user if user else None
+    return user is not None
+
+def user_exists(email):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM users WHERE email = ?
+    ''', (email,))
+    
+    user = cursor.fetchone()
+    conn.close()
+    
+    return user is not None
 
 def delete_user(username):
     conn = sqlite3.connect('user.db')
@@ -107,28 +123,17 @@ def find_user(username):
     
     return user
 
-def user_exists(email):
-    conn = sqlite3.connect('user.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        SELECT * FROM users WHERE email = ?
-    ''', (email,))
-    
-    user = cursor.fetchone()
-    conn.close()
-    
-    return user is not None
+# Conversation DB functions
 
-def create_conversation(session_id, user_id):
+def insert_conversation_id_by_userid(userid, conversationid, date):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
     try:
         cursor.execute('''
-            INSERT INTO conversations (session_id, user_id)
-            VALUES (?, ?)
-        ''', (session_id, user_id))
+            INSERT INTO conversation (userid, conversationid, last_modified)
+            VALUES (?, ?, ?)
+        ''', (userid, conversationid, date))
         conn.commit()
     except sqlite3.IntegrityError:
         return False
@@ -136,15 +141,44 @@ def create_conversation(session_id, user_id):
         conn.close()
     return True
 
-def find_conversation(session_id):
+def remove_conversation_id_by_userid(userid, conversationid):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT * FROM conversations WHERE session_id = ?
-    ''', (session_id,))
+        DELETE FROM conversation WHERE userid = ? AND conversationid = ?
+    ''', (userid, conversationid))
     
-    conversation = cursor.fetchone()
+    conn.commit()
     conn.close()
     
-    return conversation
+    return cursor.rowcount > 0
+
+def get_all_conversation_id_by_userid(userid):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT conversationid, last_modified FROM conversation WHERE userid = ?
+    ''', (userid,))
+    
+    conversations = cursor.fetchall()
+    conn.close()
+    
+    return conversations
+
+def update_conversation_by_conversation_id(conversationid, date):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        UPDATE conversation SET last_modified = ? WHERE conversationid = ?
+    ''', (date, conversationid))
+    
+    conn.commit()
+    conn.close()
+    
+    return cursor.rowcount > 0
+
+if __name__ == "__main__":
+    create_database()
