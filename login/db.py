@@ -13,7 +13,15 @@ def create_database():
             password TEXT NOT NULL
         )
     ''')
-    
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS conversations (
+            session_id TEXT PRIMARY KEY,
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -45,16 +53,13 @@ def authenticate_user(username, password):
     hashed_password = hash_password(password)
     
     cursor.execute('''
-        SELECT * FROM users WHERE username = ? AND password = ?
+        SELECT id FROM users WHERE username = ? AND password = ?
     ''', (username, hashed_password))
     
     user = cursor.fetchone()
     conn.close()
     
-    if user:
-        return True
-    else:
-        return False
+    return user if user else None
 
 def delete_user(username):
     conn = sqlite3.connect('user.db')
@@ -114,3 +119,32 @@ def user_exists(email):
     conn.close()
     
     return user is not None
+
+def create_conversation(session_id, user_id):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('''
+            INSERT INTO conversations (session_id, user_id)
+            VALUES (?, ?)
+        ''', (session_id, user_id))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+    return True
+
+def find_conversation(session_id):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM conversations WHERE session_id = ?
+    ''', (session_id,))
+    
+    conversation = cursor.fetchone()
+    conn.close()
+    
+    return conversation
