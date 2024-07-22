@@ -1,12 +1,16 @@
 import os
+import sys
 import django
-from myapp.db import create_database, register_user, authenticate_user
+import streamlit as st
+
+# 프로젝트 루트 디렉터리를 PYTHONPATH에 추가
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Django 설정 파일을 사용하도록 환경 변수 설정
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 django.setup()
 
-import streamlit as st
+from myapp.db import create_database, register_user, authenticate_user
 
 def main():
     # 페이지 상태를 세션 상태로 관리
