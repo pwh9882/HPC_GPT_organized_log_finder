@@ -1,8 +1,15 @@
+import os
+import django
+from myapp.db import create_database, register_user, authenticate_user
+
+# Django 설정 파일을 사용하도록 환경 변수 설정
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+django.setup()
+
 import streamlit as st
-from db import create_database, register_user, authenticate_user, user_exists
-from email_utils import send_reset_email
 
 def main():
+    # 페이지 상태를 세션 상태로 관리
     if 'page' not in st.session_state:
         st.session_state.page = 'login'
 
@@ -10,11 +17,10 @@ def main():
         login_page()
     elif st.session_state.page == 'signup':
         signup_page()
-    elif st.session_state.page == 'forgot_password':
-        forgot_password_page()
 
 def login_page():
     st.title("GOLF")
+
     st.markdown("---")
 
     st.text_input("전화번호, 사용자 이름 또는 이메일", key="login_username")
@@ -28,10 +34,7 @@ def login_page():
         else:
             st.warning("Incorrect Username/Password")
 
-    if st.button("비밀번호를 잊으셨나요?"):
-        st.session_state.page = 'forgot_password'
-        st.experimental_rerun()
-
+    st.markdown("비밀번호를 잊으셨나요?", unsafe_allow_html=True)
     st.markdown("---")
     if st.button("계정이 없으신가요? 가입하기"):
         st.session_state.page = 'signup'
@@ -54,24 +57,6 @@ def signup_page():
             st.warning("Username or Email already exists")
 
     if st.button("계정이 있으신가요? 로그인"):
-        st.session_state.page = 'login'
-        st.experimental_rerun()
-
-def forgot_password_page():
-    st.title("비밀번호 찾기")
-
-    email = st.text_input("이메일 주소를 입력하세요")
-    
-    if st.button("비밀번호 재설정 링크 보내기"):
-        if user_exists(email):
-            if send_reset_email(email):
-                st.success("비밀번호 재설정 링크가 이메일로 전송되었습니다.")
-            else:
-                st.error("이메일 전송에 실패했습니다. 나중에 다시 시도해주세요.")
-        else:
-            st.error("등록되지 않은 이메일 주소입니다.")
-    
-    if st.button("로그인 페이지로 돌아가기"):
         st.session_state.page = 'login'
         st.experimental_rerun()
 
