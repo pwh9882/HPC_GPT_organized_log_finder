@@ -2,11 +2,9 @@ import sqlite3
 import hashlib
 
 def create_database():
-    # 데이터베이스 파일을 연결하거나 생성합니다.
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
-    # users 테이블을 생성합니다.
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,16 +14,13 @@ def create_database():
         )
     ''')
     
-    # 변경사항을 저장하고 연결을 종료합니다.
     conn.commit()
     conn.close()
 
 def hash_password(password):
-    # 비밀번호를 해시화합니다.
     return hashlib.sha256(password.encode()).hexdigest()
 
 def register_user(username, email, password):
-    # 데이터베이스에 새로운 사용자 정보를 추가합니다.
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
@@ -44,7 +39,6 @@ def register_user(username, email, password):
     return True
 
 def authenticate_user(username, password):
-    # 사용자 인증을 처리합니다.
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
@@ -61,3 +55,49 @@ def authenticate_user(username, password):
         return True
     else:
         return False
+
+def delete_user(username):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        DELETE FROM users WHERE username = ?
+    ''', (username,))
+    
+    conn.commit()
+    conn.close()
+    
+    return cursor.rowcount > 0
+
+def update_user(username, new_email=None, new_password=None):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    if new_email:
+        cursor.execute('''
+            UPDATE users SET email = ? WHERE username = ?
+        ''', (new_email, username))
+        
+    if new_password:
+        hashed_password = hash_password(new_password)
+        cursor.execute('''
+            UPDATE users SET password = ? WHERE username = ?
+        ''', (hashed_password, username))
+    
+    conn.commit()
+    conn.close()
+    
+    return cursor.rowcount > 0
+
+def find_user(username):
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM users WHERE username = ?
+    ''', (username,))
+    
+    user = cursor.fetchone()
+    conn.close()
+    
+    return user

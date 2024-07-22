@@ -1,1 +1,3 @@
 secrets.toml
+login/user.db
+login/__pycache__/
