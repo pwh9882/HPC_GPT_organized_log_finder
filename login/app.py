@@ -1,74 +1,58 @@
 import streamlit as st
-from db import create_database, register_user, authenticate_user, delete_user, update_user, find_user
+from db import create_database, register_user, authenticate_user
 
 def main():
+    # 페이지 상태를 세션 상태로 관리
+    if 'page' not in st.session_state:
+        st.session_state.page = 'login'
+
+    if st.session_state.page == 'login':
+        login_page()
+    elif st.session_state.page == 'signup':
+        signup_page()
+
+def login_page():
+    st.title("GOLF")
+
+    st.markdown("---")
+
+    st.text_input("전화번호, 사용자 이름 또는 이메일", key="login_username")
+    st.text_input("비밀번호", type='password', key="login_password")
+    
+    if st.button("로그인"):
+        username = st.session_state.login_username
+        password = st.session_state.login_password
+        if authenticate_user(username, password):
+            st.success(f"Welcome {username}")
+        else:
+            st.warning("Incorrect Username/Password")
+
+    st.markdown("비밀번호를 잊으셨나요?", unsafe_allow_html=True)
+    st.markdown("---")
+    if st.button("계정이 없으신가요? 가입하기"):
+        st.session_state.page = 'signup'
+        st.experimental_rerun()
+
+def signup_page():
+    st.title("GOLF")
+
+    st.markdown("---")
+
+    new_email = st.text_input("휴대폰 번호 또는 이메일 주소")
+    name = st.text_input("성명")
+    new_user = st.text_input("사용자 이름")
+    new_password = st.text_input("비밀번호", type='password')
+
+    if st.button("가입"):
+        if register_user(new_user, new_email, new_password):
+            st.success("You have successfully created an account")
+        else:
+            st.warning("Username or Email already exists")
+
+    if st.button("계정이 있으신가요? 로그인"):
+        st.session_state.page = 'login'
+        st.experimental_rerun()
+
+if __name__ == "__main__":
     create_database()
-    
-    st.title("User Authentication System")
-
-    menu = ["Home", "Login", "SignUp", "Delete", "Update", "Find"]
-    choice = st.sidebar.selectbox("Menu", menu)
-
-    if choice == "Home":
-        st.subheader("Home")
-
-    elif choice == "Login":
-        st.subheader("Login Section")
-
-        username = st.sidebar.text_input("User Name")
-        password = st.sidebar.text_input("Password", type='password')
-        if st.sidebar.button("Login"):
-            if authenticate_user(username, password):
-                st.success(f"Welcome {username}")
-            else:
-                st.warning("Incorrect Username/Password")
-
-    elif choice == "SignUp":
-        st.subheader("Create New Account")
-
-        new_user = st.text_input("Username")
-        new_email = st.text_input("Email")
-        new_password = st.text_input("Password", type='password')
-
-        if st.button("SignUp"):
-            if register_user(new_user, new_email, new_password):
-                st.success("You have successfully created an account")
-            else:
-                st.warning("Username or Email already exists")
-                
-    elif choice == "Delete":
-        st.subheader("Delete Account")
-
-        username = st.text_input("Username to delete")
-        if st.button("Delete"):
-            if delete_user(username):
-                st.success(f"User {username} deleted successfully")
-            else:
-                st.warning("User not found")
-
-    elif choice == "Update":
-        st.subheader("Update Account Information")
-
-        username = st.text_input("Username to update")
-        new_email = st.text_input("New Email")
-        new_password = st.text_input("New Password", type='password')
-
-        if st.button("Update"):
-            if update_user(username, new_email, new_password):
-                st.success(f"User {username} updated successfully")
-            else:
-                st.warning("User not found or no changes made")
-    
-    elif choice == "Find":
-        st.subheader("Find User")
-
-        username = st.text_input("Username to find")
-        if st.button("Find"):
-            user = find_user(username)
-            if user:
-                st.success(f"User found: {user}")
-            else:
-                st.warning("User not found")
-
-if __name__ == '__main__':
     main()
