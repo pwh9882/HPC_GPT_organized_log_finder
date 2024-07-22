@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MyModel List</title>
+</head>
+<body>
+    <h1>MyModel List</h1>
+    <ul>
+        {% for obj in objects %}
+            <li>{{ obj.name }}: {{ obj.description }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
