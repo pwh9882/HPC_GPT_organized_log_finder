@@ -49,15 +49,15 @@ def register_user(username, email, password):
         conn.close()
     return True
 
-def authenticate_user(username, password):
+def authenticate_user(email, password):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
     hashed_password = hash_password(password)
     
     cursor.execute('''
-        SELECT * FROM users WHERE username = ? AND password = ?
-    ''', (username, hashed_password))
+        SELECT * FROM users WHERE email = ? AND password = ?
+    ''', (email, hashed_password))
     
     user = cursor.fetchone()
     conn.close()

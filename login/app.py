@@ -17,7 +17,7 @@ def login_page():
     st.title("GOLF")
     st.markdown("---")
 
-    st.text_input("전화번호, 사용자 이름 또는 이메일", key="login_username")
+    st.text_input("이메일", key="login_username")
     st.text_input("비밀번호", type='password', key="login_password")
     
     if st.button("로그인"):
