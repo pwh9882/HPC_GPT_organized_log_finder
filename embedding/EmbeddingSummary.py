@@ -62,7 +62,7 @@ class EmbeddingSummary:
             
         # return self.vectorstore : 할 필요 없음. 왜냐면 함수를 call하는 것 자체만으로 설정이 되기에
     
-        # 사용자 ID와 대화 ID에 해당하는 엔트리가 벡터 스토어에 존재하는지 chk하는 logic
+        # 사용자 ID와 대화 ID에 해당하는 엔트리가 벡터 스토어에 존재하는지 chk하는 logic - 필요없음
         # existing_entries = self.vectorstore.search({"user_id": user_id, "conversation_id": conversation_id}) # 기존 DB 로드
         # existing_entries = self.vectorstore.search({"user_id": user_id, "conversation_id": conversation_id}) # 기존 DB 로드
         # if not existing_entries:
