@@ -32,7 +32,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "user_id" not in st.session_state:
-    st.session_state.user_id = "user1"
+    st.session_state.user_id = st.session_state.login_username
 
 if "conversation_id" not in st.session_state:
     load_conversation("conversation1")
