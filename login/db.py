@@ -1,5 +1,6 @@
 import sqlite3
 import hashlib
+from datetime import datetime
 
 def create_database():
     conn = sqlite3.connect('user.db')
@@ -20,7 +21,8 @@ def create_database():
         CREATE TABLE IF NOT EXISTS conversation (
             userid TEXT NOT NULL,
             conversationid TEXT NOT NULL,
-            last_modified DATE NOT NULL,
+            conversation_title TEXT NOT NULL,
+            last_modified TEXT NOT NULL,
             PRIMARY KEY (userid, conversationid)
         )
     ''')
@@ -125,15 +127,15 @@ def find_user(username):
 
 # Conversation DB functions
 
-def insert_conversation_id_by_userid(userid, conversationid, date):
+def insert_conversation_id_by_userid(userid, conversationid, conversation_title, date):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
     
     try:
         cursor.execute('''
-            INSERT INTO conversation (userid, conversationid, last_modified)
-            VALUES (?, ?, ?)
-        ''', (userid, conversationid, date))
+            INSERT INTO conversation (userid, conversationid, conversation_title, last_modified)
+            VALUES (?, ?, ?, ?)
+        ''', (userid, conversationid, conversation_title, date))
         conn.commit()
     except sqlite3.IntegrityError:
         return False
@@ -159,13 +161,16 @@ def get_all_conversation_id_by_userid(userid):
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT conversationid, last_modified FROM conversation WHERE userid = ?
+        SELECT conversationid, conversation_title, last_modified FROM conversation WHERE userid = ?
     ''', (userid,))
     
     conversations = cursor.fetchall()
     conn.close()
     
-    return conversations
+    # last_modified를 Python의 datetime 객체로 변환
+    result = [(cid, title, datetime.strptime(last_modified, '%Y-%m-%d %H:%M:%S')) for cid, title, last_modified in conversations]
+    
+    return result
 
 def update_conversation_by_conversation_id(conversationid, date):
     conn = sqlite3.connect('user.db')
