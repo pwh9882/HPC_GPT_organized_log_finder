@@ -47,24 +47,28 @@ title_placeholder = st.empty()
 draw_session_title()
 
 with st.sidebar:
-    st.button("Create Session", use_container_width=True)
+    session_tab, search_tab = st.tabs(["Session", "Search"])
 
-    with st.container(height=300, border=True):
-        def on_session_button_clicked(id):
-            load_conversation(id)
-            draw_session_title()
+    with session_tab:
+        st.button("Create Session", use_container_width=True)
 
-        for i in range(1, 11):
-            if st.button("session" + str(i), use_container_width=True):
-                on_session_button_clicked("conversation" + str(i))
-            # st.page_link(page="streamlit_app.py", label="session" + str(i))
+        with st.container(height=600, border=True):
+            def on_session_button_clicked(id):
+                load_conversation(id)
+                draw_session_title()
 
-    with st.container(height=300, border=True):
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+            for i in range(1, 11):
+                if st.button("session" + str(i), use_container_width=True):
+                    on_session_button_clicked("conversation" + str(i))
+                # st.page_link(page="streamlit_app.py", label="session" + str(i))
 
-    st.chat_input("Session search")
+    with search_tab:
+        with st.container(height=600, border=True):
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+
+        st.chat_input("Session search")
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
