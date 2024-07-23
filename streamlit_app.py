@@ -50,7 +50,9 @@ with st.sidebar:
     session_tab, search_tab = st.tabs(["Session", "Search"])
 
     with session_tab:
-        st.button("Create Session", use_container_width=True)
+        if st.button("Create Session", use_container_width=True):
+            conversation_id = "created_session"
+            load_conversation(conversation_id)
 
         with st.container(height=600, border=True):
             def on_session_button_clicked(id):
