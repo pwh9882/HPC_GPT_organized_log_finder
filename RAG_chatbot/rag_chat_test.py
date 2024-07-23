@@ -1,4 +1,4 @@
-from rag_test2 import RAGChatbot
+from RAGChatbot import RAGChatbot
 
 
 def main():
