@@ -42,7 +42,7 @@ def signup_page():
 
     st.markdown("---")
 
-    new_email = st.text_input("휴대폰 번호 또는 이메일 주소")
+    new_email = st.text_input("이메일")
     name = st.text_input("성명")
     new_user = st.text_input("사용자 이름")
     new_password = st.text_input("비밀번호", type='password')
