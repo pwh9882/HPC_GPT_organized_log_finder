@@ -33,25 +33,21 @@ class EmbeddingSummary:
             model=st.secrets["AZURE_OPENAI_DEPLOYMENT"]
         )
         
-        # >>>>>>>>>>>>>>>>>>> load or create vector db()
-        # vector db를 가지고 있는 것을 주는 함수를 구현해야 함
-        
-        # self.vectorstore = FAISS(self.embeddings) # init 단계에서 vector_db를 load해와서 추후 load or create에서 참조가 됨
-        
         self.index_path = "인덱스 file_경로" # 인덱스 파일 경로
-        self.__initialized = True # vec Store 객체 initialization 완료 시 true
+        self.vectorstore = None  # 초기에는 None으로 설정
         
+        self.load_or_create_vector_db()  # init 단계에서 load or create vector db()에 대한 것 반영. 초기화 시 벡터스토어를 로드하거나 생성
+        
+        self.__initialized = True # vec Store 객체 초기화 완료 flag
+
     def embed_and_store_summary(self, summary: str, user_id: str, conversation_id: str):
-        # embedding = self.embeddings.embed([summary])
         metadata = {"user_id": user_id, "conversation_id": conversation_id}
     
-        # self.load_or_create_vector_db(user_id, conversation_id) # 벡터 스토어를 로드 or 새로 생성 # >>>>>>>>>>>>>>수정해야함
-        
+        # self.load_or_create_vector_db(user_id, conversation_id) # 수정해야함 - 해당 코드를 임베드하고 저장할 때 마다 호출하지 않고, init 단계에서 먼저 불러와놓고, 사용하기
         self.vectorstore.add_texts([summary], embeddings=self.embeddings, metadatas=[metadata]) # 
-        
         self.vectorstore.save_local(self.index_path) # 업데이트된 벡터스토어를 저장
 
-    def get_vector_db(self) :
+    def get_vector_db(self) : # vectorstore에 대한 getter
         return self.vectorstore
         
     def load_or_create_vector_db(self):
@@ -60,9 +56,12 @@ class EmbeddingSummary:
             self.vectorstore = FAISS.load_local(self.index_path, self.embeddings) # 있음 -> 파일경로에서 인덱스 파일 load
         else:
             self.vectorstore = FAISS(self.embeddings) # 없음 -> 새로운 vec store 추가
-            # <<이쪽에 save local logic 추가>>
             
+            # <<이쪽에서 save_local에 대한 logic 추가>>
+            self.vectorstore.save_local(self.index_path)
             
+        # return self.vectorstore : 할 필요 없음. 왜냐면 함수를 call하는 것 자체만으로 설정이 되기에
+    
         # 사용자 ID와 대화 ID에 해당하는 엔트리가 벡터 스토어에 존재하는지 chk하는 logic
         # existing_entries = self.vectorstore.search({"user_id": user_id, "conversation_id": conversation_id}) # 기존 DB 로드
         # existing_entries = self.vectorstore.search({"user_id": user_id, "conversation_id": conversation_id}) # 기존 DB 로드
