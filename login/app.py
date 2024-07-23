@@ -73,7 +73,7 @@ def forgot_password_page():
     
     if st.button("로그인 페이지로 돌아가기"):
         st.session_state.page = 'login'
-        st.experimental_rerun()
+        st.rerun()
 
 if __name__ == "__main__":
     create_database()
