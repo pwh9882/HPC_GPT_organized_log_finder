@@ -43,21 +43,12 @@ class RAGChatbot:
             model=st.secrets["AZURE_OPENAI_EMBEDDING_DEPLOYMENT"],
         )
 
-        # DB_INDEX = "rag_embeddings"
-
-        # self.vector_db = FAISS.load_local(
-        #     DB_INDEX, embeddings,
-        #     allow_dangerous_deserialization=True
-        # )
-
     def _load_dummy_vector_db_(self):
         embeddings = AzureOpenAIEmbeddings(
             model=st.secrets["AZURE_OPENAI_EMBEDDING_DEPLOYMENT"],
         )
         list_of_documents = [
-            # 페이지 내용이 "foo"이고 메타데이터로 페이지 번호 1을 가진 문서
             Document(page_content="이 대화는 FAISS 인덱스를 로드하려고 시도하고, 인덱스가 존재하지 않으면 새로운 인덱스를 생성하고 저장하는 방법에 대한 것입니다. 코드는 주어진 경로에 인덱스가 존재하면 로드하고, 존재하지 않으면 데이터를 사용하여 새로운 인덱스를 생성한 후 저장하도록 구성되어 있습니다.", metadata=dict(conversationid=0)),
-            # 페이지 내용이 "bar"이고 메타데이터로 페이지 번호 1을 가진 문서
             Document(page_content="""
                      ### 대화 요약
 
@@ -70,7 +61,6 @@ class RAGChatbot:
 
 이를 통해 LangChain에서 LLM이 메타데이터를 읽고 사용할 수 있게 함으로써 답변의 정확성을 높이고, 메타데이터 기반의 더 자세한 정보를 제공할 수 있는 방법을 논의하였습니다.
                      """, metadata=dict(conversationid=1)),
-            # 페이지 내용이 "foo"이고 메타데이터로 페이지 번호 2를 가진 문서
             Document(
                 page_content="이 대화는 사용자에게 채팅 기록과 최신 질문을 기반으로, 채팅 기록 없이도 이해할 수 있는 독립적인 질문을 다시 작성하는 방법에 대한 요청입니다.", metadata=dict(conversationid=2)),
         ]
@@ -92,7 +82,6 @@ class RAGChatbot:
 
         retriever = self.vector_db.as_retriever(
             search_type="similarity",
-            # search_kwargs={"filter": {"userid": "test_user"}}
         )
 
         def retrieve_and_prepare_context(input_dict):
@@ -108,7 +97,7 @@ class RAGChatbot:
                 refined_query = llm.predict(context_query)
             else:
                 refined_query = query
-
+            print("Refined Query:", refined_query)
             results = retriever.invoke(refined_query)
             context_blocks = []
             for doc in results:
@@ -117,6 +106,7 @@ class RAGChatbot:
                 context_blocks.append(
                     f"Content: {content}\nMetadata: {metadata}")
             context = "\n\n".join(context_blocks)
+            # print(context)
             return {"context": context, "query": query}
 
         qa_system_prompt = ChatPromptTemplate.from_messages(
@@ -142,22 +132,11 @@ class RAGChatbot:
             memory_key="chat_history"
         )
 
-        def format_chat_history(chat_history):
-            print("format_chat_history...")
-            formatted_history = []
-            for message in chat_history:
-                if message.type == "human":
-                    formatted_history.append(f"Human: {message.content}")
-                elif message.type == "ai":
-                    formatted_history.append(f"AI: {message.content}")
-            return "\n".join(formatted_history)
-
         def process_query(input_dict):
             print("process_query...")
             query = input_dict["query"]
             chat_history = memory.chat_memory.messages
-            formatted_history = format_chat_history(chat_history)
-            return {"query": query, "chat_history": formatted_history}
+            return {"query": query, "chat_history": chat_history}
 
         rag_chain = (
             RunnablePassthrough()
@@ -172,12 +151,16 @@ class RAGChatbot:
             | StrOutputParser()
         )
 
-        def update_memory(input_dict, output):
-            memory.chat_memory.add_user_message(input_dict["query"])
+        def update_memory(input_dict):
+            query = input_dict["query"]
+            output = input_dict["output"]
+            memory.chat_memory.add_user_message(query)
             memory.chat_memory.add_ai_message(output)
             return output
 
-        return RunnablePassthrough() | rag_chain | RunnableLambda(update_memory)
+        return RunnablePassthrough() | RunnableParallel(
+            {"query": lambda x: x["query"], "output": rag_chain}
+        ) | RunnableLambda(update_memory)
 
     def query(self, user_input: str) -> str:
         return self.rag_chain.invoke({"query": user_input})
