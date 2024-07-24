@@ -27,21 +27,22 @@ class RAGChatbot:
     _instance = None
     _lock = threading.Lock()
 
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
+    def __new__(cls, user_id, *args, **kwargs):
+        if user_id not in cls._instances:
             with cls._lock:
-                if not cls._instance:
-                    cls._instance = super(RAGChatbot, cls).__new__(cls)
-                    cls._instance.__initialized = False
-        return cls._instance
+                if user_id not in cls._instances:
+                    instance = super(RAGChatbot, cls).__new__(cls)
+                    instance.__initialized = False
+                    cls._instances[user_id] = instance
+        return cls._instances[user_id]
 
-    def __init__(self) -> None:
+    def __init__(self, user_id: str) -> None:
         if self.__initialized:
             return
 
+        self.user_id = user_id
         self.embedder = SummaryEmbedder()
         self._load_vector_db_()
-        # self._load_dummy_vector_db_()
         self._load_rag_model_()
         self.__initialized = True
 
@@ -61,6 +62,7 @@ class RAGChatbot:
 
         retriever = self.vector_db.as_retriever(
             search_type="similarity",
+            search_kwargs={"k": 4, "filter": {"user_id": self.user_id}}
         )
 
         def retrieve_and_prepare_context(input_dict):
@@ -168,7 +170,7 @@ class RAGChatbot:
                 pass
         return {"natural_response": natural_response, "json_data": json_data}
 
-    def query(self, user_input: str) -> [str, str]:
+    def query(self, user_input: str) -> list[str, str]:
         raw_response = self.rag_chain.invoke({"query": user_input})
         print("raw_response:", raw_response)
 
