@@ -1,6 +1,7 @@
 import threading
 
 import streamlit as st
+from login.db import update_conversation_by_conversation_id
 
 
 def get_conversation_by_id(conversation_id):
@@ -55,7 +56,8 @@ def main_area():
 
             def summarize_and_embedding(user_id, conversation, main_chatbot, embedder, session_state):
                 conversation_id = conversation["conversation_id"]
-                summary = main_chatbot.get_conversation_summary(user_id, conversation_id)
+                summary = main_chatbot.get_conversation_summary(
+                    user_id, conversation_id)
                 print(summary)
 
                 vectorstore = embedder.get_vector_db()
@@ -66,7 +68,8 @@ def main_area():
                     embedder.update_doc(summary, user_id, conversation_id)
                 else:
                     print("add")
-                    embedder.embed_and_store_summary(summary, user_id, conversation_id)
+                    embedder.embed_and_store_summary(
+                        summary, user_id, conversation_id)
 
             print("start")
             main_chatbot = st.session_state.main_chatbot
@@ -76,12 +79,15 @@ def main_area():
             thread.start()
             print("end")
 
-            summary_title = main_chatbot.get_conversation_title(user_id, conversation_id)
+            summary_title = main_chatbot.get_conversation_title(
+                user_id, conversation_id)
             print("title: ", summary_title)
 
             st.session_state.current_conversation_title = summary_title
             # st.session_state.conversation_list[get_conversation_index_by_id(conversation_id)]["conversation_title"] = summary_title
-
+            update_conversation_by_conversation_id(
+                conversation_id, summary_title
+            )
             st.rerun()
 
     pass

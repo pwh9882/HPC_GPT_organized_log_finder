@@ -100,7 +100,7 @@ class SQLSummaryChatBot:
 
         chat_history = self.get_chat_history(user_id, conversation_id).messages
         # return self.chain.invoke({"chat_history": chat_history, "input": 'Create a title that fits this conversation'}, config)
-        return self.chain.invoke({"chat_history": chat_history, "input": '이 대화 내용에 어울리는 제목을 만들어'}, config)
+        return self.chain.invoke({"chat_history": chat_history, "input": '이 대화 내용에 어울리는 아주 짧은 제목을 만들어'}, config)
 
     def invoke_chain(self, input_text: str, user_id: str, conversation_id: str) -> str:
         config = {

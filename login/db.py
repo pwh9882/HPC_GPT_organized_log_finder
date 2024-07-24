@@ -193,13 +193,16 @@ def get_all_conversation_id_by_userid(userid):
     return result
 
 
-def update_conversation_by_conversation_id(conversationid, date):
+def update_conversation_by_conversation_id(conversationid, conversation_title):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
 
+    date = datetime.now()
+
+    formatted_date = date.strftime('%Y-%m-%d %H:%M:%S')
     cursor.execute('''
-        UPDATE conversation SET last_modified = ? WHERE conversationid = ?
-    ''', (date, conversationid))
+        UPDATE conversation SET conversation_title = ?, last_modified = ? WHERE conversationid = ?
+    ''', (conversation_title, formatted_date, conversationid))
 
     conn.commit()
     conn.close()
