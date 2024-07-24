@@ -24,7 +24,7 @@ from RAG_chatbot.embedding.SummaryEmbedder import SummaryEmbedder
 
 
 class RAGChatbot:
-    _instance = None
+    _instances = {}
     _lock = threading.Lock()
 
     def __new__(cls, user_id, *args, **kwargs):
