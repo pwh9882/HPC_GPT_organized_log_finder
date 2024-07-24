@@ -27,7 +27,6 @@ def login_page():
     st.text_input("비밀번호", type='password', key="login_password")
 
     if st.button("로그인"):
-        # st.switch_page("main_app.py")
         username = st.session_state.login_username
         password = st.session_state.login_password
         if authenticate_user(username, password):
@@ -36,7 +35,7 @@ def login_page():
             st.session_state.page = "process"
             st.session_state.user_id = username
             sleep(0.5)
-            st.switch_page("main_app.py")
+            st.switch_page("main_page.py")
         else:
             st.warning("Incorrect Username/Password")
 
@@ -90,6 +89,9 @@ def signup_page():
 #         st.rerun()
 
 
-if __name__ == "__main__":
-    create_database()
-    main()
+# if __name__ == "__main__":
+#     create_database()
+#     main()
+
+create_database()
+main()
