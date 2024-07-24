@@ -10,18 +10,18 @@ if "main_chatbot" not in st.session_state:
 
 def create_conversation():
     conversation_id = str(uuid.uuid4())
-    session = {"session_name": "new session",
-               "conversation_id": conversation_id}
-    st.session_state.session_list.insert(0, session)
-    return session
+    conversation = {"session_name": "new session",
+                    "conversation_id": conversation_id}
+    st.session_state.session_list.insert(0, conversation)
+    return conversation
 
 
-def load_conversation(session):
+def load_conversation(conversation):
     chatbot = st.session_state.main_chatbot
 
     user_id = st.session_state.user_id
-    st.session_state.session = session
-    conversation_id = session["conversation_id"]
+    st.session_state.session = conversation
+    conversation_id = conversation["conversation_id"]
 
     history = chatbot.get_chat_history(user_id, conversation_id).messages
     st.session_state.messages.clear()
@@ -94,8 +94,8 @@ with st.sidebar:
 
     with session_tab:
         if st.button("Create Session", use_container_width=True):
-            session = create_conversation()
-            load_conversation(session)
+            new_conversation = create_conversation()
+            load_conversation(new_conversation)
             draw_session_title()
 
         if st.button("Remove Session", use_container_width=True):
