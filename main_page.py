@@ -12,7 +12,7 @@ def _load_main_chatbot():
     if "main_chatbot" not in st.session_state:
         st.session_state.main_chatbot = SQLSummaryChatBot()
     if "conversation_chatbot" not in st.session_state:
-        st.session_state.conversation_chatbot = RAGChatbot()
+        st.session_state.conversation_chatbot = RAGChatbot(st.session_state.user_id)
     if "summary_embedder" not in st.session_state:
         st.session_state.summary_embedder = SummaryEmbedder()
     if "messages" not in st.session_state:
