@@ -5,7 +5,7 @@ import streamlit as st
 
 def main_area():
     # title
-    st.title(st.session_state.current_conversation_id)
+    st.title(st.session_state.current_conversation_title)
 
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
