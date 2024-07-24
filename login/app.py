@@ -39,9 +39,9 @@ def login_page():
         else:
             st.warning("Incorrect Username/Password")
 
-    if st.button("비밀번호를 잊으셨나요?"):
-        st.session_state.page = 'forgot_password'
-        st.rerun()
+    # if st.button("비밀번호를 잊으셨나요?"):
+    #     st.session_state.page = 'forgot_password'
+    #     st.rerun()
 
     st.markdown("---")
     if st.button("계정이 없으신가요? 가입하기"):
