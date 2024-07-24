@@ -51,6 +51,12 @@ def remove_conversation(session_id):
         session = create_conversation()
         load_conversation(session)
 
+def rename_conversation(session_id, new_session_name):
+    if st.session_state.session_list[session_id] == st.session_state.session:
+        st.session_state.session["session_name"] = new_session_name
+    st.session_state.session_list[session_id]["session_name"] = new_session_name
+
+
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -101,6 +107,27 @@ with st.sidebar:
                     draw_session_button("e362a88b-e99c-4312-ac94-5e31dda0e042", on_session_button_clicked)
 
             remove_dialog()
+
+        if st.button("Rename Session", use_container_width=True):
+            st.session_state.choose_session_id = -1
+
+            @st.experimental_dialog("Rename Session", width="large")
+            def rename_dialog():
+                if st.session_state.choose_session_id == -1:
+                    st.write("Click session which you want to rename")
+                    with st.container(height=600, border=True):
+                        key = "4a0ec9a9-1415-4358-ab9d-262430367d8c"
+                        for i, session in enumerate(st.session_state.session_list):
+                            if st.button(session["session_name"], use_container_width=True, key=key + str(i)):
+                                draw_session_title()
+                                st.session_state.choose_session_id = i
+                else:
+                    new_session_name = st.text_input("Write new name",
+                                                     st.session_state.session_list[st.session_state.choose_session_id]["session_name"])
+                    if st.button("Rename", use_container_width=True):
+                        rename_conversation(st.session_state.choose_session_id, new_session_name)
+
+            rename_dialog()
 
         with st.container(height=600, border=True):
             def on_session_button_clicked(i):
