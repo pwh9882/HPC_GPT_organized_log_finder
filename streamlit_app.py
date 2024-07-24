@@ -22,7 +22,7 @@ def main():
         "main_page.py")], position="hidden")
     pg.run()
 
-    # login_app.main()
+    login_app.main()
 
 
 if __name__ == "__main__":
