@@ -81,6 +81,7 @@ def main_area():
 
             summary_title = main_chatbot.get_conversation_title(
                 user_id, conversation_id)
+            summary_title = summary_title.replace('"', '')
             print("title: ", summary_title)
 
             st.session_state.current_conversation_title = summary_title
