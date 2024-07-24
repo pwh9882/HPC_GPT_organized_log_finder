@@ -1,5 +1,6 @@
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain.memory import ConversationSummaryMemory
+from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
@@ -49,7 +50,7 @@ class SQLSummaryChatBot:
                 ("human", "{input}"),
             ]
         )
-        chain = prompt | self.llm | StrOutputParser()
+        self.chain = prompt | self.llm | StrOutputParser()
 
         config_fields = [
             ConfigurableFieldSpec(
@@ -71,7 +72,7 @@ class SQLSummaryChatBot:
         ]
 
         self.chain_with_history = RunnableWithMessageHistory(
-            chain,
+            self.chain,
             get_session_history=self.get_chat_history,
             input_messages_key="input",
             history_messages_key="chat_history",
@@ -88,6 +89,18 @@ class SQLSummaryChatBot:
     def get_conversation_summary(self, user_id: str, conversation_id: str) -> str:
         chat_history = self.get_chat_history(user_id, conversation_id).messages
         return self.summary_memory.predict_new_summary(messages=chat_history, existing_summary="")
+
+    def get_conversation_title(self, user_id: str, conversation_id: str) -> str:
+        config = {
+            "configurable": {
+                "user_id": user_id,
+                "conversation_id": conversation_id
+            }
+        }
+
+        chat_history = self.get_chat_history(user_id, conversation_id).messages
+        # return self.chain.invoke({"chat_history": chat_history, "input": 'Create a title that fits this conversation'}, config)
+        return self.chain.invoke({"chat_history": chat_history, "input": '이 대화 내용에 어울리는 제목을 만들어'}, config)
 
     def invoke_chain(self, input_text: str, user_id: str, conversation_id: str) -> str:
         config = {

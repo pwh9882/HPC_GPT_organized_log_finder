@@ -3,6 +3,20 @@ import threading
 import streamlit as st
 
 
+def get_conversation_by_id(conversation_id):
+    for conversation_index, conversation_item in enumerate(st.session_state.conversation_list):
+        if conversation_item["conversation_id"] == conversation_id:
+            return conversation_item
+    return None
+
+
+def get_conversation_index_by_id(conversation_id):
+    for conversation_index, conversation_item in enumerate(st.session_state.conversation_list):
+        if conversation_item["conversation_id"] == conversation_id:
+            return conversation_index
+    return None
+
+
 def main_area():
     # title
     st.title(st.session_state.current_conversation_title)
@@ -39,7 +53,8 @@ def main_area():
             st.session_state.messages.append(
                 {"role": "AI", "content": response})
 
-            def summarize_and_embedding(user_id, conversation_id, main_chatbot, embedder):
+            def summarize_and_embedding(user_id, conversation, main_chatbot, embedder, session_state):
+                conversation_id = conversation["conversation_id"]
                 summary = main_chatbot.get_conversation_summary(user_id, conversation_id)
                 print(summary)
 
@@ -57,9 +72,17 @@ def main_area():
             main_chatbot = st.session_state.main_chatbot
             embedder = st.session_state.summary_embedder
             thread = threading.Thread(target=summarize_and_embedding,
-                                      args=(user_id, conversation_id, main_chatbot, embedder))
+                                      args=(user_id, get_conversation_by_id(conversation_id), main_chatbot, embedder, st.session_state))
             thread.start()
             print("end")
+
+            summary_title = main_chatbot.get_conversation_title(user_id, conversation_id)
+            print("title: ", summary_title)
+
+            st.session_state.current_conversation_title = summary_title
+            # st.session_state.conversation_list[get_conversation_index_by_id(conversation_id)]["conversation_title"] = summary_title
+
+            st.rerun()
 
     pass
 
