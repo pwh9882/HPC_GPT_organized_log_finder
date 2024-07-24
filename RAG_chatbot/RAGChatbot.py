@@ -20,7 +20,7 @@ from langchain_core.documents import Document
 import json
 from typing import Any, Dict
 
-from embedding.SummaryEmbedder import SummaryEmbedder
+from RAG_chatbot.embedding.SummaryEmbedder import SummaryEmbedder
 
 
 class RAGChatbot:
@@ -168,7 +168,7 @@ class RAGChatbot:
                 pass
         return {"natural_response": natural_response, "json_data": json_data}
 
-    def query(self, user_input: str) -> str:
+    def query(self, user_input: str) -> [str, str]:
         raw_response = self.rag_chain.invoke({"query": user_input})
         print("raw_response:", raw_response)
 
@@ -182,4 +182,4 @@ class RAGChatbot:
         ]
 
         # Return only the natural language response to the user
-        return parsed_response["natural_response"]
+        return parsed_response["natural_response"], parsed_response['json_data']

@@ -1,3 +1,5 @@
+import threading
+
 import streamlit as st
 
 
@@ -36,6 +38,28 @@ def main_area():
             # Add assistant response to chat history
             st.session_state.messages.append(
                 {"role": "AI", "content": response})
+
+            def summarize_and_embedding(user_id, conversation_id, main_chatbot, embedder):
+                summary = main_chatbot.get_conversation_summary(user_id, conversation_id)
+                print(summary)
+
+                vectorstore = embedder.get_vector_db()
+                prev_doc = vectorstore.get(ids=[conversation_id])
+                print(prev_doc)
+                if len(prev_doc['ids']) != 0:
+                    print("update")
+                    embedder.update_doc(summary, user_id, conversation_id)
+                else:
+                    print("add")
+                    embedder.embed_and_store_summary(summary, user_id, conversation_id)
+
+            print("start")
+            main_chatbot = st.session_state.main_chatbot
+            embedder = st.session_state.summary_embedder
+            thread = threading.Thread(target=summarize_and_embedding,
+                                      args=(user_id, conversation_id, main_chatbot, embedder))
+            thread.start()
+            print("end")
 
     pass
 

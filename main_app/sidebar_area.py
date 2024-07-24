@@ -68,6 +68,13 @@ def _load_conversation_to_main_chatbot(conversation):
     pass
 
 
+def get_conversation_by_id(conversation_id):
+    for conversation_index, conversation_item in enumerate(st.session_state.conversation_list):
+        if conversation_item["conversation_id"] == conversation_id:
+            return conversation_item
+    return None
+
+
 def _conversation_tab_area(conversation_tab):
     with conversation_tab:
         # create new converstation button
@@ -102,7 +109,48 @@ def _conversation_tab_area(conversation_tab):
 
 def _search_tab_area(search_tab):
     with search_tab:
-        pass
+        with st.container(height=600, border=True):
+            for message in st.session_state.conversation_messages:
+                st.chat_message(message["role"]).markdown(message["content"])
+                if message["role"] == "AI" and "conversation_link_buttons" in message:
+                    with st.expander("Conversations", expanded=True):
+                        for conversation_link_button_context in message["conversation_link_buttons"]:
+                            conversation_id = conversation_link_button_context["id"]
+                            conversation_link_button_key = conversation_link_button_context["key"]
+                            if st.button(conversation_id, key=conversation_link_button_key):
+                                conversation = get_conversation_by_id(conversation_id)
+                                _load_conversation_to_main_chatbot(conversation)
+
+            conversation_message_human_ph = st.empty()
+            conversation_message_ai_ph = st.empty()
+            conversation_message_link_ph = st.empty()
+
+        if prompt := st.chat_input("Conversation search"):
+            chatbot = st.session_state.conversation_chatbot
+
+            conversation_message_human_ph.chat_message("Human").markdown(prompt)
+            st.session_state.conversation_messages.append({"role": "Human", "content": prompt})
+
+            natural_response, parsed_response = chatbot.query(prompt)
+            conversation_message_ai_ph.chat_message("AI").markdown(natural_response)
+
+            # st.session_state.conversation_messages.append({"role": "AI", "content": natural_response})
+            ai_message = {"role": "AI", "content": natural_response}
+
+            if "results" in parsed_response:
+                conversation_link_button_list = []
+                with conversation_message_link_ph.expander("Conversations", expanded=True):
+                    for result in parsed_response["results"]:
+                        conversation_id = str(result["conversation_id"])
+                        conversation_link_button_key = "conversation_link_button" + str(st.session_state.conversation_link_count)
+                        if st.button(conversation_id, key=conversation_link_button_key):
+                            _load_conversation_to_main_chatbot(get_conversation_by_id(conversation_id))
+
+                        conversation_link_button_list.append({"id": conversation_id, "key": conversation_link_button_key})
+                        st.session_state.conversation_link_count += 1
+                ai_message["conversation_link_buttons"] = conversation_link_button_list
+
+            st.session_state.conversation_messages.append(ai_message)
     pass
 
 

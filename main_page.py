@@ -1,4 +1,6 @@
 import streamlit as st
+
+from RAG_chatbot.RAGChatbot import RAGChatbot
 from main_app.main_area import main_area
 from main_app.sidebar_area import sidebar_area
 from summerizer.summerizer import SQLSummaryChatBot
@@ -9,14 +11,20 @@ from RAG_chatbot.embedding.SummaryEmbedder import SummaryEmbedder
 def _load_main_chatbot():
     if "main_chatbot" not in st.session_state:
         st.session_state.main_chatbot = SQLSummaryChatBot()
+    if "conversation_chatbot" not in st.session_state:
+        st.session_state.conversation_chatbot = RAGChatbot()
     if "summary_embedder" not in st.session_state:
         st.session_state.summary_embedder = SummaryEmbedder()
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "conversation_messages" not in st.session_state:
+        st.session_state.conversation_messages = []
     if "current_conversation_title" not in st.session_state:
         st.session_state.current_conversation_title = "임시 대화창"
     if "current_conversation_id" not in st.session_state:
         st.session_state.current_conversation_id = "임시 대화창"
+    if "conversation_link_count" not in st.session_state:
+        st.session_state.conversation_link_count = 0            # search tab에서 AI가 찾아준 대화 버튼에 부여할 버튼 키를 위한 카운트
 
 
 def _load_user_data_from_db():
