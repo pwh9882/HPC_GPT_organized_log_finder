@@ -99,17 +99,31 @@ class RAGChatbot:
                 If you don't know the answer after all, just say that you don't know. 
 
                 Your response should be in the following format:
-                ---
                 Natural language response to the user's query.
-                ---
                 JSON_DATA: {{
                     "results": [
                         {{
                             "summary": "A brief summary of the found information (1-2 sentences)",
-                            "conversation_id": integer
+                            "conversation_id": string
                         }},
                         // ... more results if available
                     ]
+                }}
+                
+                and here is an example:
+                당신의 이름이 언급된 채팅은 다음과 같습니다
+                JSON_DATA: {{
+                    "results": [
+                        {{
+                            "summary": "The human introduces themselves as Sarah in Korean. The AI greets Sarah in Korean, expresses pleasure in meeting her, and asks how it can assist her today.",
+                            "conversation_id": "5f2740d5-6c3f-4afb-be2e-7bfe87577030"
+                        }}
+                    ]
+                }}
+                and here is an example that you cannot find the answer:
+                죄송합니다, 답변을 찾을 수 없습니다. 제가 찾을 수 있도록 더 정보를 주실 수 있을까요?
+                JSON_DATA: {{
+                    "results": []
                 }}
 
                 Provide a natural language response for the user, followed by a JSON structure 

@@ -11,6 +11,7 @@ def _remove_conversation(conversation_index, conversation_id):
         userid=st.session_state.user_id,
         conversationid=conversation_id
     )
+    st.session_state.conversation_chatbot.embedder.delete_doc(conversation_id)
 
     if st.session_state.current_conversation_id == conversation_id:
         if len(st.session_state.conversation_list) > 0:
@@ -116,10 +117,12 @@ def _search_tab_area(search_tab):
                     with st.expander("Conversations", expanded=True):
                         for conversation_link_button_context in message["conversation_link_buttons"]:
                             conversation_id = conversation_link_button_context["id"]
-                            conversation = get_conversation_by_id(conversation_id)
+                            conversation = get_conversation_by_id(
+                                conversation_id)
                             conversation_link_button_key = conversation_link_button_context["key"]
                             if st.button(conversation["conversation_title"], key=conversation_link_button_key):
-                                _load_conversation_to_main_chatbot(conversation)
+                                _load_conversation_to_main_chatbot(
+                                    conversation)
 
             conversation_message_human_ph = st.empty()
             conversation_message_ai_ph = st.empty()
@@ -128,11 +131,14 @@ def _search_tab_area(search_tab):
         if prompt := st.chat_input("Conversation search"):
             chatbot = st.session_state.conversation_chatbot
 
-            conversation_message_human_ph.chat_message("Human").markdown(prompt)
-            st.session_state.conversation_messages.append({"role": "Human", "content": prompt})
+            conversation_message_human_ph.chat_message(
+                "Human").markdown(prompt)
+            st.session_state.conversation_messages.append(
+                {"role": "Human", "content": prompt})
 
             natural_response, parsed_response = chatbot.query(prompt)
-            conversation_message_ai_ph.chat_message("AI").markdown(natural_response)
+            conversation_message_ai_ph.chat_message(
+                "AI").markdown(natural_response)
 
             # st.session_state.conversation_messages.append({"role": "AI", "content": natural_response})
             ai_message = {"role": "AI", "content": natural_response}
@@ -143,11 +149,13 @@ def _search_tab_area(search_tab):
                     for result in parsed_response["results"]:
                         conversation_id = str(result["conversation_id"])
                         conversation = get_conversation_by_id(conversation_id)
-                        conversation_link_button_key = "conversation_link_button" + str(st.session_state.conversation_link_count)
+                        conversation_link_button_key = "conversation_link_button" + \
+                            str(st.session_state.conversation_link_count)
                         if st.button(conversation["conversation_title"], key=conversation_link_button_key):
                             _load_conversation_to_main_chatbot(conversation)
 
-                        conversation_link_button_list.append({"id": conversation_id, "key": conversation_link_button_key})
+                        conversation_link_button_list.append(
+                            {"id": conversation_id, "key": conversation_link_button_key})
                         st.session_state.conversation_link_count += 1
                 ai_message["conversation_link_buttons"] = conversation_link_button_list
 
