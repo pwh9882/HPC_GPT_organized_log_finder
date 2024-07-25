@@ -115,7 +115,7 @@ def _conversation_tab_area(conversation_tab):
                     # st.write(f"Default functionality for {conversation_id}")
 
             with col2:
-                if st.button("🗑️", key=f"delete_{conversation_id}"):
+                if st.button("🗑️", key=f"delete_{conversation_id}", use_container_width=True):
                     # st.write(f"Delete {conversation_id}")
                     _remove_conversation(conversation_id)
                     st.rerun()
@@ -136,12 +136,19 @@ def _search_tab_area(search_tab):
                                 conversation_id)
                             conversation_link_button_key = conversation_link_button_context["key"]
                             if conversation is not None:
-                                if st.button(conversation["conversation_title"], key=conversation_link_button_key):
+                                if st.button(conversation["conversation_title"], key=conversation_link_button_key, use_container_width=True):
                                     _load_conversation_to_main_chatbot(
                                         conversation)
                             else:
+
+
+<< << << < HEAD
                                 st.button(
                                     "대화 삭제됨", key=conversation_link_button_key, disabled=True)
+== == == =
+                                st.button("대화 삭제됨", key=conversation_link_button_key,
+                                          disabled=True, use_container_width=True)
+>>>>>> > 5f3ecf1d8c0e48c1028479e9d3fa57ec76e471bb
 
             conversation_message_human_ph = st.empty()
             conversation_message_ai_ph = st.empty()
@@ -170,7 +177,7 @@ def _search_tab_area(search_tab):
                         conversation = get_conversation_by_id(conversation_id)
                         conversation_link_button_key = "conversation_link_button" + \
                                                        str(st.session_state.conversation_link_count)
-                        if st.button(conversation["conversation_title"], key=conversation_link_button_key):
+                        if st.button(conversation["conversation_title"], key=conversation_link_button_key, use_container_width=True):
                             _load_conversation_to_main_chatbot(conversation)
 
                         conversation_link_button_list.append(
