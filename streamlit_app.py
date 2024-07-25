@@ -30,7 +30,7 @@ def main():
             if authenticate_user(username, hashed_password, True):
                 st.session_state.page = "process"
                 st.session_state.user_id = username
-                sleep(0.5)
+                # sleep(0.5)
                 st.switch_page("main_page.py")
 
     login_app.main()
