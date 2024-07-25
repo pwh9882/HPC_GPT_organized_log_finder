@@ -26,8 +26,8 @@ def _remove_conversation(conversation_index, conversation_id):
     st.session_state.conversation_chatbot.embedder.delete_doc(conversation_id)
 
     # 마지막 대화가 삭제되었을 때, 새로운 대화를 생성
-    if len(st.session_state.conversation_list) == 0:
-        _create_conversation()
+    # if len(st.session_state.conversation_list) == 0:
+    #     _create_conversation()
 
 
 def _create_conversation():
@@ -43,10 +43,10 @@ def _create_conversation():
         conversation_title=conversation["conversation_title"],
         date=conversation["last_modified"]
     )
-    st.session_state.conversation_list.insert(0, conversation)
+    # st.session_state.conversation_list.insert(0, conversation)
     # 생성된 대화를 로드
     _load_conversation_to_main_chatbot(conversation)
-    return conversation
+    st.rerun()
 
 
 def _create_temp_conversation():
@@ -94,9 +94,9 @@ def _conversation_tab_area(conversation_tab):
         # create new converstation button
         if st.button("Create New Conversation", use_container_width=True):
             _create_conversation()
-            _load_conversation_to_main_chatbot(
-                st.session_state.conversation_list[0]
-            )
+            # _load_conversation_to_main_chatbot(
+            #     st.session_state.conversation_list[0]
+            # )
             pass
 
         # st.markdown("""---""")
@@ -108,14 +108,15 @@ def _conversation_tab_area(conversation_tab):
             col1, col2 = st.columns([6, 1])
 
             with col1:
-                if st.button(conversation_item["conversation_title"], key=f"button_{conversation_id}", use_container_width=True):
+                if st.button(conversation_item["conversation_title"], key=f"button_{conversation_id}",
+                             use_container_width=True):
                     _load_conversation_to_main_chatbot(conversation_item)
                     # st.write(f"Default functionality for {conversation_id}")
 
             with col2:
                 if st.button("🗑️", key=f"delete_{conversation_id}"):
                     # st.write(f"Delete {conversation_id}")
-                    _remove_conversation(conversation_index, conversation_id)
+                    _remove_conversation(conversation_id)
                     st.rerun()
             pass
     pass
@@ -133,9 +134,13 @@ def _search_tab_area(search_tab):
                             conversation = get_conversation_by_id(
                                 conversation_id)
                             conversation_link_button_key = conversation_link_button_context["key"]
-                            if st.button(conversation["conversation_title"], key=conversation_link_button_key):
-                                _load_conversation_to_main_chatbot(
-                                    conversation)
+                            if conversation is not None:
+                                if st.button(conversation["conversation_title"], key=conversation_link_button_key):
+                                    _load_conversation_to_main_chatbot(
+                                        conversation)
+                            else:
+                                st.button(
+                                    "Not available", key=conversation_link_button_key, disabled=True)
 
             conversation_message_human_ph = st.empty()
             conversation_message_ai_ph = st.empty()
@@ -163,7 +168,7 @@ def _search_tab_area(search_tab):
                         conversation_id = str(result["conversation_id"])
                         conversation = get_conversation_by_id(conversation_id)
                         conversation_link_button_key = "conversation_link_button" + \
-                            str(st.session_state.conversation_link_count)
+                                                       str(st.session_state.conversation_link_count)
                         if st.button(conversation["conversation_title"], key=conversation_link_button_key):
                             _load_conversation_to_main_chatbot(conversation)
 
