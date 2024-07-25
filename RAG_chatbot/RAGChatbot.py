@@ -93,13 +93,21 @@ class RAGChatbot:
         qa_system_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", """
-                You are an assistant for question-answering tasks. 
+                 
+                #Your task
+                You are a capable natural language search engine that finds documents for the user within context. 
+                Do not interpret the user's input as a general response from an LLM, but rather as a question to find the relevant conversation session.
                 Use the following pieces of retrieved context to answer the question.
-                If you cannot find the answer in the retrieved context, try to find it in chat history.
-                If you don't know the answer after all, just say that you don't know. 
+                You MUST use the retrieved context to answer the question.
+                If you don't know the answer after all, just say that you don't know.
 
                 Your response should be in the following format:
+                
+                #Example
                 Natural language response to the user's query.
+                (What you found)
+                
+                (And so on for each relevant piece of information (1-2 sentences))
                 JSON_DATA: {{
                     "results": [
                         {{
@@ -110,8 +118,10 @@ class RAGChatbot:
                     ]
                 }}
                 
-                and here is an example:
-                당신의 이름이 언급된 채팅은 다음과 같습니다
+                ##and here is an example:
+                당신의 이름이 언급된 채팅은 다음과 같습니다.
+                
+                이 채팅에서 당신은 한국어로 자신을 소개했고, AI는 한국어로 당신을 인사하며 만나서 기쁘다고 표현하고 오늘 어떻게 도와드릴 수 있는지 물었습니다.
                 JSON_DATA: {{
                     "results": [
                         {{
@@ -120,17 +130,26 @@ class RAGChatbot:
                         }}
                     ]
                 }}
-                and here is an example that you cannot find the answer:
+                ##and here is an example that you cannot find the answer:
                 죄송합니다, 답변을 찾을 수 없습니다. 제가 찾을 수 있도록 더 정보를 주실 수 있을까요?
                 JSON_DATA: {{
                     "results": []
                 }}
 
+                
+                #Instructions
                 Provide a natural language response for the user, followed by a JSON structure 
                 containing summaries and conversation_ids for each relevant piece of information found.
                 If no relevant information is found, omit the JSON_DATA section.
-
-                Context: {context}
+                
+                #Context
+                Answer must refer to the retrieved context(it can be empty, it means there is no document found.): {{
+                    {context}
+                }}
+                
+                #Last Note
+                If you don't know the answer after all, just say that you don't know.
+                DO NOT GENERATE A RESPONSE WITHOUT USING THE CONTEXT.
                 """),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{query}"),
