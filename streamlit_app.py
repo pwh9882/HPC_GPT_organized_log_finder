@@ -1,8 +1,13 @@
+import sys
 from time import sleep
 
 import streamlit as st
 from login.db import create_database, register_user, authenticate_user, user_exists, get_login_cookie
 from login import app as login_app
+
+__import__('pysqlite3')
+
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # from main_page import main_page
 
