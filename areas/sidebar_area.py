@@ -183,7 +183,8 @@ def _search_tab_area(search_tab):
 def _settings_tab_area(settings_tab):
     with settings_tab:
         if st.button("로그아웃"):
-            pass
+            st.session_state.clear()
+            st.switch_page("login/app.py")
 
         if st.button("대화 초기화"):
             pass
