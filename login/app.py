@@ -1,12 +1,10 @@
 from time import sleep
 
 import streamlit as st
-from login.db import create_database, register_user, authenticate_user, user_exists
+from login.db import create_database, register_user, authenticate_user, user_exists, set_login_cookie, get_login_cookie
 
 
 def main():
-    # pg = st.navigation(pages=[st.Page("app.py"), st.Page("pages/streamlit_app.py")], position="hidden")
-    # pg.run()
 
     if 'page' not in st.session_state:
         st.session_state.page = 'login'
@@ -20,6 +18,7 @@ def main():
 
 
 def login_page():
+
     st.title("GOLF")
     st.markdown("---")
 
@@ -31,7 +30,7 @@ def login_page():
         password = st.session_state.login_password
         if authenticate_user(email, password):
             st.success(f"Welcome {email}")
-
+            set_login_cookie(email, password)
             st.session_state.page = "process"
             st.session_state.user_id = email
             sleep(0.5)
@@ -62,7 +61,7 @@ def signup_page():
     if st.button("가입"):
         if register_user(new_email, new_email, new_password):
             st.success("You have successfully created an account")
-
+            set_login_cookie(new_email, new_password)
             st.session_state.page = "process"
             st.session_state.user_id = new_email
             sleep(0.5)

@@ -1,6 +1,8 @@
 import sqlite3
 import hashlib
 from datetime import datetime
+import streamlit as st
+from streamlit_cookies_controller import CookieController
 
 
 def create_database():
@@ -55,15 +57,16 @@ def register_user(username, email, password):
     return True
 
 
-def authenticate_user(email, password):
+def authenticate_user(email, password, is_hashed=False):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
 
-    hashed_password = hash_password(password)
+    if not is_hashed:
+        password = hash_password(password)
 
     cursor.execute('''
         SELECT * FROM users WHERE email = ? AND password = ?
-    ''', (email, hashed_password))
+    ''', (email, password))
 
     user = cursor.fetchone()
     conn.close()
@@ -208,6 +211,26 @@ def update_conversation_by_conversation_id(conversationid, conversation_title):
     conn.close()
 
     return cursor.rowcount > 0
+
+
+def set_login_cookie(username, password):
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    controller = CookieController()
+    controller.set("user_id", username)
+    controller.set("hash_password", hashed_password)
+
+
+def get_login_cookie():
+    controller = CookieController()
+    user_id = controller.get("user_id")
+    hash_password = controller.get("hash_password")
+    return user_id, hash_password
+
+
+def clear_login_cookie():
+    controller = CookieController()
+    controller.remove("user_id")
+    controller.remove("hash_password")
 
 
 if __name__ == "__main__":

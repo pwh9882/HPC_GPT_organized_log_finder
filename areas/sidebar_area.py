@@ -1,6 +1,6 @@
 import streamlit as st
 import uuid
-from login.db import insert_conversation_id_by_userid, remove_conversation_id_by_userid, delete_user
+from login.db import insert_conversation_id_by_userid, remove_conversation_id_by_userid, delete_user, clear_login_cookie
 import datetime
 from time import sleep
 
@@ -185,6 +185,7 @@ def _search_tab_area(search_tab):
 def _settings_tab_area(settings_tab):
     with settings_tab:
         if st.button("로그아웃", use_container_width=True,):
+            clear_login_cookie()
             st.session_state.clear()
             st.success("로그아웃 되었습니다.")
             sleep(0.5)

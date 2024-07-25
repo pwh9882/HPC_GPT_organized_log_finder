@@ -7,6 +7,8 @@ from summerizer.summerizer import SQLSummaryChatBot
 from login.db import get_all_conversation_id_by_userid
 from RAG_chatbot.embedding.SummaryEmbedder import SummaryEmbedder
 
+from streamlit_cookies_controller import CookieController
+
 
 def _load_main_chatbot():
     if "main_chatbot" not in st.session_state:
