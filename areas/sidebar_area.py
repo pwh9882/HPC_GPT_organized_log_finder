@@ -180,12 +180,25 @@ def _search_tab_area(search_tab):
     pass
 
 
+def _settings_tab_area(settings_tab):
+    with settings_tab:
+        if st.button("로그아웃"):
+            pass
+
+        if st.button("대화 초기화"):
+            pass
+
+        if st.button("회원탈퇴"):
+            pass
+
+
 def sidebar_area():
     with st.sidebar:
-        conversation_tab, search_tab = st.tabs(["Conversation", "Search"])
+        conversation_tab, search_tab, settings_tab = st.tabs(["Conversation", "Search", "Settings"])
 
         _conversation_tab_area(conversation_tab)
         _search_tab_area(search_tab)
+        _settings_tab_area(settings_tab)
 
     pass
 
