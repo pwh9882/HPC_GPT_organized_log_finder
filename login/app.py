@@ -62,6 +62,11 @@ def signup_page():
     if st.button("가입"):
         if register_user(new_user, new_email, new_password):
             st.success("You have successfully created an account")
+
+            st.session_state.page = "process"
+            st.session_state.user_id = new_email
+            sleep(0.5)
+            st.switch_page("main_page.py")
         else:
             st.warning("Username or Email already exists")
 
