@@ -85,13 +85,13 @@ def user_exists(email):
     return user is not None
 
 
-def delete_user(username):
+def delete_user(email):
     conn = sqlite3.connect('user.db')
     cursor = conn.cursor()
 
     cursor.execute('''
-        DELETE FROM users WHERE username = ?
-    ''', (username,))
+        DELETE FROM users WHERE email = ?
+    ''', (email,))
 
     conn.commit()
     conn.close()

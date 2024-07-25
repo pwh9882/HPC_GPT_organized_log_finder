@@ -23,17 +23,17 @@ def login_page():
     st.title("GOLF")
     st.markdown("---")
 
-    st.text_input("이메일", key="login_username")
+    st.text_input("이메일", key="email")
     st.text_input("비밀번호", type='password', key="login_password")
 
     if st.button("로그인"):
-        username = st.session_state.login_username
+        email = st.session_state.email
         password = st.session_state.login_password
-        if authenticate_user(username, password):
-            st.success(f"Welcome {username}")
+        if authenticate_user(email, password):
+            st.success(f"Welcome {email}")
 
             st.session_state.page = "process"
-            st.session_state.user_id = username
+            st.session_state.user_id = email
             sleep(0.5)
             st.switch_page("main_page.py")
         else:
@@ -55,12 +55,12 @@ def signup_page():
     st.markdown("---")
 
     new_email = st.text_input("이메일")
-    name = st.text_input("성명")
-    new_user = st.text_input("사용자 이름")
+    # name = new_email  # st.text_input("성명")
+    # new_user = new_email  # st.text_input("사용자 이름")
     new_password = st.text_input("비밀번호", type='password')
 
     if st.button("가입"):
-        if register_user(new_user, new_email, new_password):
+        if register_user(new_email, new_email, new_password):
             st.success("You have successfully created an account")
 
             st.session_state.page = "process"

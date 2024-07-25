@@ -1,7 +1,8 @@
 import streamlit as st
 import uuid
-from login.db import insert_conversation_id_by_userid, remove_conversation_id_by_userid
+from login.db import insert_conversation_id_by_userid, remove_conversation_id_by_userid, delete_user
 import datetime
+from time import sleep
 
 
 def _remove_conversation(conversation_id):
@@ -139,7 +140,8 @@ def _search_tab_area(search_tab):
                                     _load_conversation_to_main_chatbot(
                                         conversation)
                             else:
-                                st.button("대화 삭제됨", key=conversation_link_button_key, disabled=True)
+                                st.button(
+                                    "대화 삭제됨", key=conversation_link_button_key, disabled=True)
 
             conversation_message_human_ph = st.empty()
             conversation_message_ai_ph = st.empty()
@@ -182,19 +184,39 @@ def _search_tab_area(search_tab):
 
 def _settings_tab_area(settings_tab):
     with settings_tab:
-        if st.button("로그아웃"):
+        if st.button("로그아웃", use_container_width=True):
+            st.session_state.clear()
+            st.success("로그아웃 되었습니다.")
+            sleep(0.5)
+            st.switch_page("login/app.py")
             pass
 
-        if st.button("대화 초기화"):
-            pass
+        with st.expander("모든 대화 삭제"):
+            st.error("정말로 모든 대화를 삭제하시겠습니까?")
+            if st.button("확인", key="delete_all_conversations", use_container_width=True):
+                for conversation in st.session_state.conversation_list:
+                    _remove_conversation(conversation["conversation_id"])
+                st.session_state.conversation_list.clear()
+                st.success("모든 대화가 삭제되었습니다.")
+                st.rerun()
 
-        if st.button("회원탈퇴"):
-            pass
+        with st.expander("회원탈퇴"):
+            st.error("정말로 회원탈퇴를 하시겠습니까?")
+            st.error("이 작업은 되돌릴 수 없습니다.")
+            if st.button("확인", key="delete_account", use_container_width=True):
+                for conversation in st.session_state.conversation_list:
+                    _remove_conversation(conversation["conversation_id"])
+                delete_user(st.session_state.user_id)
+                st.session_state.clear()
+                st.success("회원탈퇴가 완료되었습니다.")
+                sleep(0.5)
+                st.switch_page("login/app.py")
 
 
 def sidebar_area():
     with st.sidebar:
-        conversation_tab, search_tab, settings_tab = st.tabs(["Conversation", "Search", "Settings"])
+        conversation_tab, search_tab, settings_tab = st.tabs(
+            ["Conversation", "Search", "Settings"])
 
         _conversation_tab_area(conversation_tab)
         _search_tab_area(search_tab)
