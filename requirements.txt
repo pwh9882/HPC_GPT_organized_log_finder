@@ -20,6 +20,7 @@ cffi==1.16.0
 charset-normalizer==3.3.2
 chroma-hnswlib==0.7.3
 chromadb-pysqlite3==0.5.3
+pysqlite3==0.5.3
 ci-info==0.3.0
 click==8.1.7
 coloredlogs==15.0.1
