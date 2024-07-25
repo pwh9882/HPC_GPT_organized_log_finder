@@ -139,7 +139,7 @@ def _search_tab_area(search_tab):
                                     _load_conversation_to_main_chatbot(
                                         conversation)
                             else:
-                                st.button("Not available", key=conversation_link_button_key, disabled=True)
+                                st.button("대화 삭제됨", key=conversation_link_button_key, disabled=True)
 
             conversation_message_human_ph = st.empty()
             conversation_message_ai_ph = st.empty()
