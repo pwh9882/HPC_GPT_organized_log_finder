@@ -5,13 +5,6 @@ import datetime
 
 
 def _remove_conversation(conversation_index, conversation_id):
-    del st.session_state.conversation_list[conversation_index]
-
-    remove_conversation_id_by_userid(
-        userid=st.session_state.user_id,
-        conversationid=conversation_id
-    )
-    st.session_state.conversation_chatbot.embedder.delete_doc(conversation_id)
 
     if st.session_state.current_conversation_id == conversation_id:
         temp_conversation = _create_temp_conversation()
@@ -24,6 +17,13 @@ def _remove_conversation(conversation_index, conversation_id):
         #     )
         # else:
         #     st.session_state.current_conversation_id = None
+    del st.session_state.conversation_list[conversation_index]
+
+    remove_conversation_id_by_userid(
+        userid=st.session_state.user_id,
+        conversationid=conversation_id
+    )
+    st.session_state.conversation_chatbot.embedder.delete_doc(conversation_id)
 
     # 마지막 대화가 삭제되었을 때, 새로운 대화를 생성
     if len(st.session_state.conversation_list) == 0:
