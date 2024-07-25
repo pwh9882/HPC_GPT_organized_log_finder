@@ -23,7 +23,7 @@ def _load_main_chatbot():
     if "current_conversation_title" not in st.session_state:
         st.session_state.current_conversation_title = "임시 대화창"
     if "current_conversation_id" not in st.session_state:
-        st.session_state.current_conversation_id = "임시 대화창"
+        st.session_state.current_conversation_id = "temp_conversation"
     if "conversation_link_count" not in st.session_state:
         # search tab에서 AI가 찾아준 대화 버튼에 부여할 버튼 키를 위한 카운트
         st.session_state.conversation_link_count = 0

@@ -14,12 +14,16 @@ def _remove_conversation(conversation_index, conversation_id):
     st.session_state.conversation_chatbot.embedder.delete_doc(conversation_id)
 
     if st.session_state.current_conversation_id == conversation_id:
-        if len(st.session_state.conversation_list) > 0:
-            _load_conversation_to_main_chatbot(
-                st.session_state.conversation_list[0]
-            )
-        else:
-            st.session_state.current_conversation_id = None
+        temp_conversation = _create_temp_conversation()
+        st.session_state.current_conversation_id = temp_conversation["conversation_id"]
+        st.session_state.current_conversation_title = temp_conversation["conversation_title"]
+        st.session_state.messages.clear()
+        # if len(st.session_state.conversation_list) > 0:
+        #     _load_conversation_to_main_chatbot(
+        #         st.session_state.conversation_list[0]
+        #     )
+        # else:
+        #     st.session_state.current_conversation_id = None
 
     # 마지막 대화가 삭제되었을 때, 새로운 대화를 생성
     if len(st.session_state.conversation_list) == 0:
@@ -38,11 +42,20 @@ def _create_conversation():
         conversationid=conversation_id,
         conversation_title=conversation["conversation_title"],
         date=conversation["last_modified"]
-
     )
     st.session_state.conversation_list.insert(0, conversation)
     # 생성된 대화를 로드
     _load_conversation_to_main_chatbot(conversation)
+    return conversation
+
+
+def _create_temp_conversation():
+    conversation = {
+        "conversation_title": "임시 대화창",
+        "conversation_id": "temp_conversation",
+        "last_modified": datetime.datetime.now()
+    }
+    # no insert to list & no load from db because of temp conversation
     return conversation
 
 

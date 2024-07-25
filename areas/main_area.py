@@ -54,6 +54,9 @@ def main_area():
             st.session_state.messages.append(
                 {"role": "AI", "content": response})
 
+            if st.session_state.current_conversation_id == "temp_conversation":
+                return
+
             def summarize_and_embedding(user_id, conversation, main_chatbot, embedder, session_state):
                 conversation_id = conversation["conversation_id"]
                 summary = main_chatbot.get_conversation_summary(
