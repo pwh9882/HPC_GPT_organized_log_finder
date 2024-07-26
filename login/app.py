@@ -49,7 +49,7 @@ def login_page():
 
 
 def signup_page():
-    st.title("GOLF")
+    st.title(":golf: GOLF: GPT organized log finder")
 
     st.markdown("---")
 
