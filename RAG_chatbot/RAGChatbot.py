@@ -62,7 +62,7 @@ class RAGChatbot:
 
         retriever = self.vector_db.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 4, "filter": {"user_id": self.user_id}}
+            search_kwargs={"k": 6, "filter": {"user_id": self.user_id}}
         )
 
         def retrieve_and_prepare_context(input_dict):
@@ -130,6 +130,26 @@ class RAGChatbot:
                         }}
                     ]
                 }}
+                
+                ##and this is when muilple results are found:
+                다음은 LLM에 관한 채팅입니다.
+
+                첫 번째 채팅에서는 사용자가 AI에게 LLM에 대해 간단히 설명해달라고 요청했고, AI는 LLM이 "Large Language Model"의 약자로, 대규모 데이터셋을 학습하여 인간과 같은 텍스트를 생성하거나 이해할 수 있는 AI 모델이라고 설명했습니다. 이러한 모델은 번역, 요약, 질문 응답, 대화 생성 등 다양한 자연어 처리 작업에 사용되며, OpenAI의 GPT-3가 그 예로 언급되었습니다.
+
+                두 번째 채팅에서도 사용자가 LLM 모델에 대해 묻자, AI는 LLM (Large Language Models)이 자연어 처리를 위해 설계된 AI 모델로, 방대한 양의 텍스트 데이터를 학습하여 인간과 같은 언어를 이해하고 생성할 수 있다고 설명했습니다. 예로는 OpenAI의 GPT-3, Google's BERT, Meta's LLaMA가 언급되었으며, 이러한 모델들은 번역, 요약, 질문 응답, 텍스트 생성과 같은 작업에 사용된다고 설명했습니다. 모델의 성능은 주로 파라미터 수와 학습 데이터 양에 의해 결정됩니다.
+                JSON_DATA: {{
+                    "results": [
+                        {{
+                            "summary": "The user asked the AI to explain LLM, and the AI described it as an abbreviation for 'Large Language Model' that can generate or understand human-like text by training on large datasets. The AI mentioned that such models are used for various NLP tasks like translation, summarization, question-answering, and conversation generation, and cited OpenAI's GPT-3 as an example.",
+                            "conversation_id": "5f2740d5-6c3f-4afb-be2e-7bfe87577030"
+                        }},
+                        {{
+                            "summary": "The user inquired about LLM models again, and the AI explained that LLMs are AI models designed for natural language processing that can understand and generate human-like language by training on vast amounts of text data. Examples such as OpenAI's GPT-3, Google's BERT, and Meta's LLaMA were mentioned, and these models are used for tasks like translation, summarization, question-answering, and text generation. The performance of the models is primarily determined by the number of parameters and the amount of training data.",
+                            "conversation_id": "5f2740d5-6c3f-4afb-be2e-7bfe87577030"
+                        }}
+                    ]
+                }}
+                
                 ##and here is an example that you cannot find the answer:
                 죄송합니다, 답변을 찾을 수 없습니다. 제가 찾을 수 있도록 더 정보를 주실 수 있을까요?
                 JSON_DATA: {{

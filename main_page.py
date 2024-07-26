@@ -23,7 +23,7 @@ def _load_main_chatbot():
     if "conversation_messages" not in st.session_state:
         st.session_state.conversation_messages = []
     if "current_conversation_title" not in st.session_state:
-        st.session_state.current_conversation_title = "임시 대화창"
+        st.session_state.current_conversation_title = "임시 채팅"
     if "current_conversation_id" not in st.session_state:
         st.session_state.current_conversation_id = "temp_conversation"
     if "conversation_link_count" not in st.session_state:
