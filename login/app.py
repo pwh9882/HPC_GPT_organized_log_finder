@@ -19,7 +19,7 @@ def main():
 
 def login_page():
 
-    st.title("GOLF")
+    st.title(":golf: GOLF: GPT organized log finder")
     st.markdown("---")
 
     st.text_input("이메일", key="email")
