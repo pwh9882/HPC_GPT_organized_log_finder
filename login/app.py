@@ -21,6 +21,8 @@ def login_page():
 
     st.title(":golf: GOLF: GPT organized log finder")
     st.markdown("---")
+    st.markdown("<h2 style='text-align: center;'>로그인</h2>",
+                unsafe_allow_html=True)
 
     st.text_input("이메일", key="email")
     st.text_input("비밀번호", type='password', key="login_password")
@@ -52,6 +54,8 @@ def signup_page():
     st.title(":golf: GOLF: GPT organized log finder")
 
     st.markdown("---")
+    st.markdown("<h2 style='text-align: center;'>회원가입</h2>",
+                unsafe_allow_html=True)
 
     new_email = st.text_input("이메일")
     # name = new_email  # st.text_input("성명")
@@ -69,6 +73,7 @@ def signup_page():
         else:
             st.warning("Username or Email already exists")
 
+    st.markdown("---")
     if st.button("계정이 있으신가요? 로그인"):
         st.session_state.page = 'login'
         st.rerun()

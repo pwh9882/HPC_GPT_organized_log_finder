@@ -34,7 +34,7 @@ def _remove_conversation(conversation_id):
 def _create_conversation():
     conversation_id = str(uuid.uuid4())
     conversation = {
-        "conversation_title": "new converstation",
+        "conversation_title": "New converstation",
         "conversation_id": conversation_id,
         "last_modified": datetime.datetime.now()
     }
@@ -52,7 +52,7 @@ def _create_conversation():
 
 def _create_temp_conversation():
     conversation = {
-        "conversation_title": "임시 대화창",
+        "conversation_title": "임시 채팅",
         "conversation_id": "temp_conversation",
         "last_modified": datetime.datetime.now()
     }
@@ -125,7 +125,7 @@ def _conversation_tab_area(conversation_tab):
 
 def _search_tab_area(search_tab):
     with search_tab:
-        with st.container(height=600, border=True):
+        with st.container(height=700, border=True):
             for message in st.session_state.conversation_messages:
                 st.chat_message(message["role"]).markdown(message["content"])
                 if message["role"] == "AI" and "conversation_link_buttons" in message:
@@ -183,7 +183,12 @@ def _search_tab_area(search_tab):
 
 
 def _settings_tab_area(settings_tab):
+
     with settings_tab:
+        st.markdown("---")
+        st.markdown(f"<h1 style='text-align: center;'>{st.session_state.user_id}</h1>",
+                    unsafe_allow_html=True)
+        st.markdown("---")
         if st.button("로그아웃", use_container_width=True,):
             clear_login_cookie()
             st.session_state.clear()

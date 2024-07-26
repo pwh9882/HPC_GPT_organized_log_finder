@@ -21,6 +21,8 @@ def get_conversation_index_by_id(conversation_id):
 def main_area():
     # title
     st.title(st.session_state.current_conversation_title)
+    if st.session_state.current_conversation_id == "temp_conversation":
+        st.caption("이 채팅은 내 기록에 남지 않으며, 메모리를 사용 또는 생성하지 않습니다.")
 
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
