@@ -62,7 +62,7 @@ class RAGChatbot:
 
         retriever = self.vector_db.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 4, "filter": {"user_id": self.user_id}}
+            search_kwargs={"k": 6, "filter": {"user_id": self.user_id}}
         )
 
         def retrieve_and_prepare_context(input_dict):
